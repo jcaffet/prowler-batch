@@ -1,0 +1,29 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Stack providing cross account access for Prowler
+
+Parameters:
+
+  ProwlerAccount:
+    Description: AWS account ID where Prowler is installed
+    Type: String
+    ConstraintDescription: Must be a valid AWS account ID
+
+Resources:
+
+  ProwlerScanAssumeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: prowler-scan-assumerole
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${ProwlerAccount}:root'
+          Action:
+          - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/SecurityAudit
+      Path: "/"
+

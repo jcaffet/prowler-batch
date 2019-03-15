@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Common resources for Prowler Batch
+# Stack Name : prowler-common
+# Description : this stack creates the Prowler main stack prerequisites :
+# - one ECR repository
+# - one S3 bucket
+
+
+Parameters:
+
+  TagBlock:
+    Description: Applicative block tag
+    Type: String
+
+  TagApp:
+    Description: Application referenced by this stack
+    Type: String
+
+  TagOrg:
+    Description: Organization Unit
+    Type: String
+
+  ProwlerEcrRepoName:
+    Description: ECR name for the Prowler repo
+    Type: String
+
+
+Resources:
+
+  ProwlerEcrRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub '${ProwlerEcrRepoName}'
+
+  ProwlerS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${TagApp}-${AWS::AccountId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      Tags:
+      - Key: Block
+        Value: !Sub '${TagBlock}'
+      - Key: App
+        Value: !Sub '${TagApp}'
+      - Key: Org
+        Value: !Sub '${TagOrg}'
+
+Outputs:
+
+  ProwlerEcrRepository:
+    Description: Prowler ECR repository
+    Value: !GetAtt ProwlerEcrRepository.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-EcrRepository"
+
+  ProwlerS3Bucket:
+    Description: Prowler S3 bucket
+    Value: !GetAtt ProwlerS3Bucket.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-S3Bucket"
+
