@@ -4,7 +4,7 @@ TMP_ASSUME_ROLE_FILE=/tmp/assume-role.json
 
 echo "Collecting credentials for ${ACCOUNT} for role ${PROWLER_ROLE_TO_ASSUME}"
 aws sts assume-role --role-arn arn:aws:iam::${ACCOUNT}:role/${PROWLER_ROLE_TO_ASSUME} \
-	            --role-session-name assumeRoleForCloudSploi >${TMP_ASSUME_ROLE_FILE}
+	            --role-session-name assumeRoleForProwler >${TMP_ASSUME_ROLE_FILE}
 
 export AWS_SECRET_ACCESS_KEY=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.SecretAccessKey`
 export AWS_ACCESS_KEY_ID=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.AccessKeyId`
