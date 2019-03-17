@@ -69,7 +69,7 @@ Parameters:
     Type: String
 
   ProwlerRoleToAssume:
-    Description: IAM role to assume on the child account to Prowler
+    Description: IAM role to assume on the spoke account to Prowler
     Type: String
     Default: prowler-scan-assumerole
 
