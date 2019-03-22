@@ -11,10 +11,10 @@ Parameters:
 
 Resources:
 
-  ProwlerScanAssumeRole:
+  ProwlerScanRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: prowler-organizations-assumerole
+      RoleName: prowler-organizations-role
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Statement:

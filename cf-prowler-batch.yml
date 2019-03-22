@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Prowler Batch
+# Name : prowler-batch
 # Architectural choices :
 # - no user, no password, no key, only roles
 # - no ssh access to compute envs
@@ -68,15 +69,15 @@ Parameters:
     Description: ECR image to use
     Type: String
 
-  ProwlerRoleToAssume:
+  ProwlerScanRole:
     Description: IAM role to assume on the spoke account to Prowler
     Type: String
-    Default: prowler-scan-assumerole
+    Default: prowler-scan-role
 
   ProwlerOrganizationsRole:
     Description: IAM role to assume on the Organizations account to Prowler
     Type: String
-    Default: prowler-organizations-assumerole
+    Default: prowler-organizations-role
 
   ProwlerOrganizationsAccount:
     Description: AWS accountId uisng Organizations
@@ -229,7 +230,7 @@ Resources:
             Action:
             - "sts:AssumeRole"
             Resource:
-            - !Sub "arn:aws:iam::*:role/${ProwlerRoleToAssume}"
+            - !Sub "arn:aws:iam::*:role/${ProwlerScanRole}"
       - PolicyName: writeReportsBucketPolicy
         PolicyDocument:
           Statement:
@@ -323,7 +324,7 @@ Resources:
                   import boto3
                   def lambda_handler(event, context):
                     
-                    PROWLER_ROLE_TO_ASSUME = os.environ['PROWLER_ROLE_TO_ASSUME']
+                    PROWLER_SCAN_ROLE = os.environ['PROWLER_SCAN_ROLE']
                     ORGANIZATIONS_ROLE = os.environ['ORGANIZATIONS_ROLE']
                     ORGANIZATIONS_ACCOUNT = os.environ['ORGANIZATIONS_ACCOUNT']
                     session = get_session(role=ORGANIZATIONS_ROLE, account=ORGANIZATIONS_ACCOUNT, session_name='prowler_lambda')
@@ -343,13 +344,13 @@ Resources:
                               'value': accountId
                             },
                             {
-                              'name': 'PROWLER_ROLE_TO_ASSUME',
-                              'value': PROWLER_ROLE_TO_ASSUME
+                              'name': 'PROWLER_SCAN_ROLE',
+                              'value': PROWLER_SCAN_ROLE
                             },
                           ]
                         }
                       )
-                      print("Job %s launched with jobId %s to scan account %s with role %s" % (response['jobName'], response['jobId'], accountId, PROWLER_ROLE_TO_ASSUME))
+                      print("Job %s launched with jobId %s to scan account %s with role %s" % (response['jobName'], response['jobId'], accountId, PROWLER_SCAN_ROLE))
                     
                   def get_session(role=None, account=None, region=None, session_name='my_session'):
                   
@@ -402,7 +403,7 @@ Resources:
           JOBDEFINITION: !Ref ProwlerJobDefinition
           CONFIGFILE_BUCKET: !Ref ProwlerBucket
           CONFIGFILE_NAME: "config/accounts.list"
-          PROWLER_ROLE_TO_ASSUME: !Ref ProwlerRoleToAssume
+          PROWLER_SCAN_ROLE: !Ref ProwlerScanRole
           ORGANIZATIONS_ROLE: !Ref ProwlerOrganizationsRole
           ORGANIZATIONS_ACCOUNT: !Ref ProwlerOrganizationsAccount
       MemorySize: 128
