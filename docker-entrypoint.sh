@@ -13,11 +13,11 @@ export AWS_SESSION_TOKEN=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.Sessi
 now=`date +'%Y-%m-%d'`
 report_file_prefix=${ACCOUNT}-${now}
 echo "Generating CloudSploit CIS LEVEL1 report ..."
-./prowler -g cislevel1 -M csv >${report_file_prefix}-cislevel1.csv
+# possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel1 -M mono >${report_file_prefix}-cislevel1.txt
 
 echo "Generating CloudSploit CIS LEVEL2 report ..."
-./prowler -g cislevel2 -M csv >${report_file_prefix}-cislevel2.csv
+# possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel2 -M mono >${report_file_prefix}-cislevel2.txt
 
 echo "Saving the report files in s3://${PROWLER_BUCKET}/reports/${ACCOUNT}"
