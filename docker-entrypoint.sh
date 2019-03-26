@@ -10,13 +10,18 @@ export AWS_SECRET_ACCESS_KEY=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.S
 export AWS_ACCESS_KEY_ID=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.AccessKeyId`
 export AWS_SESSION_TOKEN=`cat ${TMP_ASSUME_ROLE_FILE} | jq -r .Credentials.SessionToken`
 
+if [ -z "${AWS_SECRET_ACCESS_KEY}" ]; then echo "AWS_SECRET_ACCESS_KEY not set !"; exit 1; fi
+if [ -z "${AWS_ACCESS_KEY_ID}" ]; then echo "AWS_ACCESS_KEY_ID not set !"; exit 1; fi
+if [ -z "${AWS_SESSION_TOKEN}" ]; then echo "AWS_SESSION_TOKEN not set !"; exit 1; fi
+
 now=`date +'%Y-%m-%d'`
 report_file_prefix=${ACCOUNT}-${now}
-echo "Generating CloudSploit CIS LEVEL1 report ..."
+
+echo "Generating CloudSploit CIS LEVEL1 report in ${report_file_prefix}-cislevel1.txt ..."
 # possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel1 -M mono >${report_file_prefix}-cislevel1.txt
 
-echo "Generating CloudSploit CIS LEVEL2 report ..."
+echo "Generating CloudSploit CIS LEVEL2 report in ${report_file_prefix}-cislevel2.txt ..."
 # possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel2 -M mono >${report_file_prefix}-cislevel2.txt
 
