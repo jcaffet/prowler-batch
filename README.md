@@ -1,15 +1,16 @@
 # Prowler Batch
 
-Prowler Batch is an AWS account security scanner specialist based on [Prowler scanner engine](https://github.com/toniblyx/prowler) and embeded into AWS Batch jobs.
+Prowler Batch is an AWS account security scanner specialist based on [Prowler script](https://github.com/toniblyx/prowler) and embeded into AWS Batch jobs.
 
 ## Description
 
-People need to audit their account to seek security issues or validate compliance. Prowler Batch is here to do the job for you at a defined frenquency.
+People need to audit their account to seek security issues or validate compliance. Prowler Batch is here to do the job for you at a defined frequency.
 It ensures cost containment and security hardening.
+Reports are stored into an S3 Bucket.
 
 ## Technicals details
 
-Prowler batch simply runs [Prowler scanner engines](https://github.com/toniblyx/prowler) into AWS Batch jobs.
+Prowler batch simply runs [Prowler script](https://github.com/toniblyx/prowler) into AWS Batch jobs.
 It simply industrializes the deletion process thanks to the following AWS ressources :
 - CloudWatch Rule to trigger the deletion execution
 - Batch to ensure a pay per use strategy
@@ -35,5 +36,10 @@ Prowler needs :
 6. deploy the cf-prowler-batch.yml Cloudformation stack in the central account
 
 ## How to use it
-Scans are perform on a conigured daily basis and reports are stored in the S3 bucket.
+
+When installed, no action is needed.
+
+## Extension
+
+It is possible to export Prowler's results into csv files and run Athena on into for large investigations.
 
