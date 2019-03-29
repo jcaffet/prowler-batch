@@ -17,11 +17,11 @@ if [ -z "${AWS_SESSION_TOKEN}" ]; then echo "AWS_SESSION_TOKEN not set !"; exit 
 now=`date +'%Y-%m-%d'`
 report_file_prefix=${ACCOUNT}-${now}
 
-echo "Generating CloudSploit CIS LEVEL1 report in ${report_file_prefix}-cislevel1.txt ..."
+echo "Generating CIS LEVEL1 report in ${report_file_prefix}-cislevel1.txt ..."
 # possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel1 -M mono >${report_file_prefix}-cislevel1.txt
 
-echo "Generating CloudSploit CIS LEVEL2 report in ${report_file_prefix}-cislevel2.txt ..."
+echo "Generating CIS LEVEL2 report in ${report_file_prefix}-cislevel2.txt ..."
 # possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel2 -M mono >${report_file_prefix}-cislevel2.txt
 
