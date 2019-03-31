@@ -14,7 +14,7 @@ Prowler batch simply runs [Prowler script](https://github.com/toniblyx/prowler) 
 It simply industrializes the deletion process thanks to the following AWS ressources :
 - CloudWatch Rule to trigger the deletion execution
 - Batch to ensure a pay per use strategy
-- ECR to host the Docker image that embeds aw-nuke
+- ECR to host the Docker image that embeds Prowler
 - Lambda to gather the accounts to perform and submit the jobs
 - S3 to store generated reports
 - Cloudwatch Logs to log the global acitivity
