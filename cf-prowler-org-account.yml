@@ -31,4 +31,3 @@ Resources:
           - Effect: "Allow"
             Action: organizations:ListAccounts
             Resource: '*'
-

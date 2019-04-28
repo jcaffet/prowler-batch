@@ -29,11 +29,13 @@ Prowler needs :
 
 ## Installation
 
-1. deploy the cf-prowler-common.yml Cloudformation stack in the central account
+1. deploy the cf-prowler-common.yml CloudFormation stack in the central account
 2. Git clone prowler scans into this directory and build, tag and push the Docker image. Follow the information provided in the ECR repository page.
 3. deploy the cf-prowler-org-account.yaml in the account using AWS Organizations
 4. deploy the cf-prowler-spoke-account.yaml in all the accounts using to scan. To make it easy, use StackSets Stacks from the AWS Organizations level.
-6. deploy the cf-prowler-batch.yml Cloudformation stack in the central account
+6. deploy the cf-prowler-batch.yml CloudFormation stack in the central account
+
+Do not forget a strong ExternalId like UUID.
 
 ## How to use it
 

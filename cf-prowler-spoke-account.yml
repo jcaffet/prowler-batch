@@ -10,6 +10,10 @@ Parameters:
     Type: String
     ConstraintDescription: Must be a valid AWS account ID
 
+  ProwlerRoleExternalId:
+    Description: Prowler Role ExternalID
+    Type: String
+
 Resources:
 
   ProwlerScanAssumeRole:
@@ -24,6 +28,9 @@ Resources:
             AWS: !Sub 'arn:aws:iam::${ProwlerCentralAccount}:root'
           Action:
           - sts:AssumeRole
+          Condition:
+            StringEquals:
+              "sts:ExternalId": !Sub '${ProwlerRoleExternalId}'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/SecurityAudit
       Path: "/"
@@ -36,4 +43,3 @@ Resources:
             - "support:DescribeTrustedAdvisorChecks"
             Resource:
             - "*"
-

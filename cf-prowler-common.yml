@@ -11,14 +11,17 @@ Parameters:
   TagBlock:
     Description: Applicative block tag
     Type: String
+    Default: security
 
   TagApp:
-    Description: Application referenced by this stack
+    Description: Application tag
     Type: String
+    Default: prowler
 
   TagOrg:
-    Description: Organization Unit
+    Description: Organization tag
     Type: String
+    Default: cloudteam
 
   ProwlerEcrRepoName:
     Description: ECR name for the Prowler repo
@@ -29,7 +32,7 @@ Resources:
 
   ProwlerEcrRepository:
     Type: AWS::ECR::Repository
-    Properties: 
+    Properties:
       RepositoryName: !Sub '${ProwlerEcrRepoName}'
 
   ProwlerS3Bucket:
@@ -61,4 +64,3 @@ Outputs:
     Value: !GetAtt ProwlerS3Bucket.Arn
     Export:
       Name: !Sub "${AWS::StackName}-S3Bucket"
-
