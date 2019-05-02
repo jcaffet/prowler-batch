@@ -25,11 +25,9 @@ today=`date +'%Y-%m-%d'`
 report_file_prefix=${ACCOUNT}-${today}-prowler
 
 echo "Generating Prowler CIS checks report in ${report_file_prefix}-cis.txt ..."
-# possible export formats : mono, csv, json, html, ...
 ./prowler -g cislevel2 -M mono >${report_file_prefix}-cis.txt
 
 echo "Generating Prowler Extras checks report in ${report_file_prefix}-extras.txt ..."
-# possible export formats : mono, csv, json, html, ...
 ./prowler -g extras -M mono >${report_file_prefix}-extras.txt
 
 echo "Saving the report files in s3://${REPORTING_BUCKET}/${ACCOUNT}"
