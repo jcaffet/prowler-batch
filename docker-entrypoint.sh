@@ -2,6 +2,7 @@
 
 TMP_ASSUME_ROLE_FILE=/tmp/assume-role.json
 
+if [ -z "${ACCOUNT}" ]; then echo "ACCOUNT not set !"; exit 1; fi
 if [ -z "${REPORTING_BUCKET}" ]; then echo "REPORTING_BUCKET not set !"; exit 1; fi
 if [ -z "${PROWLER_SCAN_ROLE}" ]; then echo "PROWLER_SCAN_ROLE not set !"; exit 1; fi
 if [ -z "${PROWLER_ROLE_EXTERNALID}" ]; then echo "PROWLER_ROLE_EXTERNALID not set !"; exit 1; fi
