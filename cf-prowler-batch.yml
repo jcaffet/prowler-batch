@@ -15,10 +15,10 @@ Metadata:
           default: 'Compute Env Cpu'
         Parameters: ['ComputeEnvMinCpu', 'ComputeEnvDesiredCpu', 'ComputeEnvMaxCpu', 'ComputeEnvInstanceTypes']
       - Label:
-          default: 'Access to the AWS Organzations account'
+          default: 'Access to the AWS Organizations account'
         Parameters: ['ProwlerOrganizationsAccount', 'ProwlerOrganizationsRole', 'ProwlerOrganizationsRoleExternalId']
       - Label:
-          default: 'Access to the Child accounts'
+          default: 'Access to the spoke accounts'
         Parameters: ['ProwlerScanRole', 'ProwlerScanRoleExternalId']
 
 Parameters:
@@ -26,7 +26,7 @@ Parameters:
   DisplayName:
     Description: Project name
     Type: String
-    Default: "prowler"
+    Default: prowler
 
   TagBlock:
     Description: Applicative block tag
