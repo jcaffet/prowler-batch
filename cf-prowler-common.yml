@@ -3,8 +3,7 @@ Description: Common resources for Prowler Batch
 # Stack Name : prowler-common
 # Description : this stack creates the Prowler main stack prerequisites :
 # - one ECR repository
-# - one S3 bucket
-
+# - if needed, one S3 bucket to store reports (otherwise use an external one)
 
 Parameters:
 
@@ -26,7 +25,16 @@ Parameters:
   ProwlerEcrRepoName:
     Description: ECR name for the Prowler repo
     Type: String
+    Default: prowler
 
+  UseOwnReportingBucket:
+    Description: Enable a dedicated Bucket to store reports
+    Type: String
+    Default: true
+    AllowedValues: [true, false]
+
+Conditions:
+  HasProwlerOwnReportingBucket: !Equals [!Ref UseOwnReportingBucket, true]
 
 Resources:
 
@@ -35,8 +43,9 @@ Resources:
     Properties:
       RepositoryName: !Sub '${ProwlerEcrRepoName}'
 
-  ProwlerS3Bucket:
+  ProwlerReportingBucket:
     Type: AWS::S3::Bucket
+    Condition: HasProwlerOwnReportingBucket
     Properties:
       BucketName: !Sub '${TagApp}-${AWS::AccountId}'
       BucketEncryption:
@@ -58,9 +67,3 @@ Outputs:
     Value: !GetAtt ProwlerEcrRepository.Arn
     Export:
       Name: !Sub "${AWS::StackName}-EcrRepository"
-
-  ProwlerS3Bucket:
-    Description: Prowler S3 bucket
-    Value: !GetAtt ProwlerS3Bucket.Arn
-    Export:
-      Name: !Sub "${AWS::StackName}-S3Bucket"

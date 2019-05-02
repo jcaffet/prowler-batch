@@ -9,9 +9,13 @@ Parameters:
     Type: String
     ConstraintDescription: Must be a valid AWS account ID
 
+  ProwlerRoleExternalId:
+    Description: Prowler Role ExternalID
+    Type: String
+
 Resources:
 
-  ProwlerScanRole:
+  ProwlerOrganizationsRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: prowler-organizations-role
@@ -23,6 +27,9 @@ Resources:
             AWS: !Sub 'arn:aws:iam::${ProwlerAccount}:root'
           Action:
           - sts:AssumeRole
+          Condition:
+            StringEquals:
+              "sts:ExternalId": !Sub '${ProwlerRoleExternalId}'
       Policies:
       - PolicyName: "AllowOrganizationListAccounts"
         PolicyDocument:

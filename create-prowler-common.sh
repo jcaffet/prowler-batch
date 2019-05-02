@@ -1,8 +1,8 @@
 #!/bin/bash
 
 usage(){
-    echo "Usage: $0 <profile>" 
-    echo "profile : aws profile to use for deployment" 
+    echo "Usage: $0 <profile>"
+    echo "profile : aws profile to use for deployment"
 }
 
 if [ $# -eq 1 ]; then
@@ -20,6 +20,5 @@ aws --profile=${profile} cloudformation create-stack \
     --template-body file://cf-${APP}-common.yml \
     --parameters ParameterKey=TagBlock,ParameterValue=security \
                  ParameterKey=TagApp,ParameterValue=${APP} \
-                 ParameterKey=TagOrg,ParameterValue=cloudaccelerationteam \
-                 ParameterKey=ProwlerEcrRepoName,ParameterValue=cloudaccelerationteam/${APP}
-
+                 ParameterKey=TagOrg,ParameterValue=cloudteam \
+                 ParameterKey=ProwlerEcrRepoName,ParameterValue=${APP}

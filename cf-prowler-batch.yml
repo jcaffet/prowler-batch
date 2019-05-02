@@ -9,11 +9,17 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: 'Compute Env network'
+          default: 'Compute Env Network'
         Parameters: ['ComputeEnvVPC', 'ComputeEnvSubnets']
       - Label:
           default: 'Compute Env Cpu'
         Parameters: ['ComputeEnvMinCpu', 'ComputeEnvDesiredCpu', 'ComputeEnvMaxCpu', 'ComputeEnvInstanceTypes']
+      - Label:
+          default: 'Access to the AWS Organzations account'
+        Parameters: ['ProwlerOrganizationsAccount', 'ProwlerOrganizationsRole', 'ProwlerOrganizationsRoleExternalId']
+      - Label:
+          default: 'Access to the Child accounts'
+        Parameters: ['ProwlerScanRole', 'ProwlerScanRoleExternalId']
 
 Parameters:
 
@@ -83,21 +89,25 @@ Parameters:
     Type: String
     Default: prowler-scan-role
 
-  ProwlerRoleExternalId:
+  ProwlerScanRoleExternalId:
     Description: CloudSploit Role ExternalID
     Type: String
 
   ProwlerOrganizationsRole:
-    Description: IAM role to assume on the Organizations account to Prowler
+    Description: IAM role to assume on the Organizations account for Prowler
     Type: String
     Default: prowler-organizations-role
+
+  ProwlerOrganizationsRoleExternalId:
+    Description: ExternalId of role on the Organizations account for Prowler
+    Type: String
 
   ProwlerOrganizationsAccount:
     Description: AWS accountId uisng Organizations
     Type: String
 
-  ProwlerBucket:
-    Description: S3 bucket for Prowler assets
+  ProwlerReportingBucket:
+    Description: S3 bucket for Prowler reports
     Type: String
 
 
@@ -215,8 +225,12 @@ Resources:
         Vcpus: 1
         Image: !Ref ProwlerEcrImage
         Environment:
-          - Name: PROWLER_BUCKET
-            Value: !Ref ProwlerBucket
+        - Name: REPORTING_BUCKET
+          Value: !Ref ProwlerReportingBucket
+        - Name: PROWLER_SCAN_ROLE
+          Value: !Ref ProwlerScanRole
+        - Name: PROWLER_ROLE_EXTERNALID
+          Value: !Ref ProwlerScanRoleExternalId
       RetryStrategy:
         Attempts: 1
 
@@ -251,7 +265,7 @@ Resources:
             Action:
             - "s3:PutObject"
             Resource:
-            - !Sub "arn:aws:s3:::${ProwlerBucket}/reports/*"
+            - !Sub "arn:aws:s3:::${ProwlerReportingBucket}/*"
 
   ProwlerScheduledRule:
     Type: AWS::Events::Rule
@@ -292,14 +306,6 @@ Resources:
             - "sts:AssumeRole"
             Resource:
             - !Sub "arn:aws:iam::*:role/${ProwlerOrganizationsRole}"
-      - PolicyName: accessConfigBucketPolicy
-        PolicyDocument:
-          Statement:
-          - Effect: "Allow"
-            Action:
-            - "s3:GetObject"
-            Resource:
-            - !Sub "arn:aws:s3:::${ProwlerBucket}/config/accounts.list"
       - PolicyName: launch-jobs-allow
         PolicyDocument:
           Statement:
@@ -335,14 +341,13 @@ Resources:
                   import os
                   import json
                   import boto3
-                  def lambda_handler(event, context):
 
-                    PROWLER_SCAN_ROLE = os.environ['PROWLER_SCAN_ROLE']
-                    PROWLER_ROLE_EXTERNALID = os.environ['PROWLER_ROLE_EXTERNALID']
+                  def lambda_handler(event, context):
                     ORGANIZATIONS_ROLE = os.environ['ORGANIZATIONS_ROLE']
+                    ORGANIZATIONS_ROLE_EXTERNALID = os.environ['ORGANIZATIONS_ROLE_EXTERNALID']
                     ORGANIZATIONS_ACCOUNT = os.environ['ORGANIZATIONS_ACCOUNT']
-                    session = get_session(account=ORGANIZATIONS_ACCOUNT,role=ORGANIZATIONS_ROLE, externalId=PROWLER_ROLE_EXTERNALID,session_name='prowler_lambda')
-                    accounts = getAllActiveAccounts(session)
+                    session = get_session(account=ORGANIZATIONS_ACCOUNT,role=ORGANIZATIONS_ROLE, externalId=ORGANIZATIONS_ROLE_EXTERNALID,session_name='prowler_lambda')
+                    accounts = getAllOrgActiveAccounts(session)
                     print("Found %s accounts to scan." % (len(accounts)))
 
                     client = boto3.client('batch')
@@ -357,21 +362,12 @@ Resources:
                               'name': 'ACCOUNT',
                               'value': accountId
                             },
-                            {
-                              'name': 'PROWLER_SCAN_ROLE',
-                              'value': PROWLER_SCAN_ROLE
-                            },
-                            {
-                              'name': 'PROWLER_ROLE_EXTERNALID',
-                              'value': PROWLER_ROLE_EXTERNALID
-                            },
                           ]
                         }
                       )
-                      print("Job %s launched with jobId %s to scan account %s with role %s" % (response['jobName'], response['jobId'], accountId, PROWLER_SCAN_ROLE))
+                      print("Job %s launched with jobId %s to scan account %s" % (response['jobName'], response['jobId'], accountId))
 
                   def get_session(account=None, role=None, externalId=None, region=None, session_name='my_session'):
-
                       # If the role is given : assumes a role and returns boto3 session
                       # otherwise : returns a regular session with the current IAM user/role
                       if role:
@@ -387,8 +383,7 @@ Resources:
                       else:
                           return boto3.Session()
 
-                  def getAllActiveAccounts(session):
-
+                  def getAllOrgActiveAccounts(session):
                       client = session.client('organizations')
                       paginator = client.get_paginator('list_accounts')
                       page_iterator = paginator.paginate()
@@ -400,30 +395,13 @@ Resources:
                               if account['Status'] == "ACTIVE":
                                 activeAccountIds.append(account[ "Id" ])
                       return activeAccountIds
-
-                  def retreiveAccountList():
-                    CONFIGFILE_BUCKET = os.environ['CONFIGFILE_BUCKET']
-                    CONFIGFILE_NAME = os.environ['CONFIGFILE_NAME']
-                    tempFile = '/tmp/accounts.list'
-                    accountList=[]
-
-                    s3client = boto3.client('s3')
-                    s3client.download_file(CONFIGFILE_BUCKET, CONFIGFILE_NAME, tempFile)
-                    for line in open(tempFile):
-                      li=line.strip()
-                      if not li.startswith("#"):
-                        accountList.append(line.rstrip())
-                    return accountList
       Environment:
         Variables:
           JOBNAME: "prowler-job"
           JOBQUEUE: !Ref ProwlerJobQueue
           JOBDEFINITION: !Ref ProwlerJobDefinition
-          CONFIGFILE_BUCKET: !Ref ProwlerBucket
-          CONFIGFILE_NAME: "config/accounts.list"
-          PROWLER_SCAN_ROLE: !Ref ProwlerScanRole
-          PROWLER_ROLE_EXTERNALID: !Ref ProwlerRoleExternalId
           ORGANIZATIONS_ROLE: !Ref ProwlerOrganizationsRole
+          ORGANIZATIONS_ROLE_EXTERNALID: !Ref ProwlerOrganizationsRoleExternalId
           ORGANIZATIONS_ACCOUNT: !Ref ProwlerOrganizationsAccount
       MemorySize: 128
       Role: !Sub ${ProwlerJobLauncherLambdaRole.Arn}
