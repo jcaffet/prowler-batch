@@ -85,12 +85,12 @@ Parameters:
     Type: String
 
   ProwlerScanRole:
-    Description: IAM role to assume on the child account to Prowler
+    Description: IAM role to assume on the spoke accounts for Prowler
     Type: String
     Default: prowler-scan-role
 
   ProwlerScanRoleExternalId:
-    Description: CloudSploit Role ExternalID
+    Description: ExternalId for roles on spoke accounts
     Type: String
 
   ProwlerOrganizationsRole:
@@ -103,7 +103,7 @@ Parameters:
     Type: String
 
   ProwlerOrganizationsAccount:
-    Description: AWS accountId uisng Organizations
+    Description: AWS accountId using Organizations
     Type: String
 
   ProwlerReportingBucket:

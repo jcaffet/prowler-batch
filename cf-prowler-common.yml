@@ -5,6 +5,7 @@ Description: Common resources for Prowler Batch
 # - one ECR repository
 # - if needed, one S3 bucket to store reports (otherwise use an external one)
 
+
 Parameters:
 
   TagBlock:
@@ -34,7 +35,7 @@ Parameters:
     AllowedValues: [true, false]
 
 Conditions:
-  HasProwlerOwnReportingBucket: !Equals [!Ref UseOwnReportingBucket, true]
+  HasOwnReportingBucket: !Equals [!Ref UseOwnReportingBucket, true]
 
 Resources:
 
@@ -45,7 +46,7 @@ Resources:
 
   ProwlerReportingBucket:
     Type: AWS::S3::Bucket
-    Condition: HasProwlerOwnReportingBucket
+    Condition: HasOwnReportingBucket
     Properties:
       BucketName: !Sub '${TagApp}-${AWS::AccountId}'
       BucketEncryption:
