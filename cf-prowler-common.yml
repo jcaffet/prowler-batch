@@ -9,7 +9,7 @@ Description: Common resources for Prowler Batch
 Parameters:
 
   TagBlock:
-    Description: Applicative block tag
+    Description: Block tag
     Type: String
     Default: security
 
