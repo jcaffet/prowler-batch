@@ -405,7 +405,7 @@ Resources:
           ORGANIZATIONS_ACCOUNT: !Ref ProwlerOrganizationsAccount
       MemorySize: 128
       Role: !Sub ${ProwlerJobLauncherLambdaRole.Arn}
-      Runtime: "python3.6"
+      Runtime: "python3.7"
       Timeout: 60
       Tags:
       - Key: Block
