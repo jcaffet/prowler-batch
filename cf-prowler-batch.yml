@@ -15,8 +15,8 @@ Metadata:
           default: 'Compute Env Cpu'
         Parameters: ['ComputeEnvMinCpu', 'ComputeEnvDesiredCpu', 'ComputeEnvMaxCpu', 'ComputeEnvInstanceTypes']
       - Label:
-          default: 'Access to the AWS Organizations account'
-        Parameters: ['ProwlerOrganizationsAccount', 'ProwlerOrganizationsRole', 'ProwlerOrganizationsRoleExternalId']
+          default: 'Access to the AWS Organizations service account'
+        Parameters: ['OrganizationAccount', 'OrganizationRole', 'OrganizationRoleExternalId']
       - Label:
           default: 'Access to the spoke accounts'
         Parameters: ['ProwlerScanRole', 'ProwlerScanRoleExternalId']
@@ -93,16 +93,16 @@ Parameters:
     Description: ExternalId for roles on spoke accounts
     Type: String
 
-  ProwlerOrganizationsRole:
+  OrganizationRole:
     Description: IAM role to assume on the Organizations account for Prowler
     Type: String
     Default: prowler-organizations-role
 
-  ProwlerOrganizationsRoleExternalId:
+  OrganizationRoleExternalId:
     Description: ExternalId of role on the Organizations account for Prowler
     Type: String
 
-  ProwlerOrganizationsAccount:
+  OrganizationAccount:
     Description: AWS accountId using Organizations
     Type: String
 
@@ -305,7 +305,7 @@ Resources:
             Action:
             - "sts:AssumeRole"
             Resource:
-            - !Sub "arn:aws:iam::*:role/${ProwlerOrganizationsRole}"
+            - !Sub "arn:aws:iam::${OrganizationAccount}:role/${OrganizationRole}"
       - PolicyName: launch-jobs-allow
         PolicyDocument:
           Statement:
@@ -327,13 +327,13 @@ Resources:
   ProwlerLambdaLogGroup:
     Type: "AWS::Logs::LogGroup"
     Properties:
-      LogGroupName: !Sub '/aws/lambda/${TagBlock}-${TagApp}'
+      LogGroupName: !Sub '/aws/lambda/${ProwlerJobLauncherLambda}'
       RetentionInDays: 30
 
   ProwlerJobLauncherLambda:
     Type: "AWS::Lambda::Function"
     Properties:
-      FunctionName: !Sub '${TagBlock}-${TagApp}'
+      FunctionName: !Sub '${TagApp}-launcher'
       Description: "Launch Prowler scan jobs"
       Handler: "index.lambda_handler"
       Code:
@@ -343,10 +343,10 @@ Resources:
                   import boto3
 
                   def lambda_handler(event, context):
-                      ORGANIZATIONS_ROLE = os.environ['ORGANIZATIONS_ROLE']
-                      ORGANIZATIONS_ROLE_EXTERNALID = os.environ['ORGANIZATIONS_ROLE_EXTERNALID']
-                      ORGANIZATIONS_ACCOUNT = os.environ['ORGANIZATIONS_ACCOUNT']
-                      session = get_session(account=ORGANIZATIONS_ACCOUNT,role=ORGANIZATIONS_ROLE, externalId=ORGANIZATIONS_ROLE_EXTERNALID, session_name='cloudsploit_lambda')
+                      ORGANIZATION_ROLE = os.environ['ORGANIZATION_ROLE']
+                      ORGANIZATION_ROLE_EXTERNALID = os.environ['ORGANIZATION_ROLE_EXTERNALID']
+                      ORGANIZATION_ACCOUNT = os.environ['ORGANIZATION_ACCOUNT']
+                      session = get_session(account=ORGANIZATION_ACCOUNT,role=ORGANIZATION_ROLE, externalId=ORGANIZATION_ROLE_EXTERNALID, session_name='cloudsploit_lambda')
                       accounts = getAllActiveAccounts(session)
                       print("Found %s accounts to scan." % (len(accounts)))
 
@@ -398,9 +398,9 @@ Resources:
           JOBNAME: "prowler-job"
           JOBQUEUE: !Ref ProwlerJobQueue
           JOBDEFINITION: !Ref ProwlerJobDefinition
-          ORGANIZATIONS_ROLE: !Ref ProwlerOrganizationsRole
-          ORGANIZATIONS_ROLE_EXTERNALID: !Ref ProwlerOrganizationsRoleExternalId
-          ORGANIZATIONS_ACCOUNT: !Ref ProwlerOrganizationsAccount
+          ORGANIZATION_ROLE: !Ref OrganizationRole
+          ORGANIZATION_ROLE_EXTERNALID: !Ref OrganizationRoleExternalId
+          ORGANIZATION_ACCOUNT: !Ref OrganizationAccount
       MemorySize: 128
       Role: !Sub ${ProwlerJobLauncherLambdaRole.Arn}
       Runtime: "python3.7"
