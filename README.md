@@ -11,7 +11,7 @@ Reports are stored into an S3 Bucket.
 ## Technicals details
 
 Prowler batch simply runs [Prowler script](https://github.com/toniblyx/prowler) into AWS Batch jobs.
-It simply industrializes the deletion process thanks to the following AWS resources :
+It industrializes the scan process thanks to the following AWS resources :
 - CloudWatch Rule to trigger the deletion execution
 - Batch to ensure a pay per use strategy
 - ECR to host the Docker image that embeds Prowler
