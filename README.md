@@ -17,7 +17,7 @@ It industrializes the scan process thanks to the following AWS resources :
 - ECR to host the Docker image that embeds Prowler
 - Lambda to gather the accounts to perform and submit the jobs
 - S3 to store generated reports
-- Cloudwatch Logs to log the global activity
+- CloudWatch Logs to log the global activity
 
 ![Prowler Batch Diagram](images/prowlerbatch-diagram.png)
 
@@ -29,10 +29,10 @@ Prowler needs :
 
 ## Installation
 
-1. deploy the cf-prowler-common.yml CloudFormation stack in the central account
+1. deploy the [cf-prowler-common.yml](cf-prowler-common.yml) CloudFormation stack in the central account
 2. Git clone prowler scans into this directory and build, tag and push the Docker image. Follow the information provided in the ECR repository page.
-3. deploy the cf-prowler-org-account.yaml in the account using AWS Organizations
-4. deploy the cf-prowler-spoke-account.yaml in all the accounts using to scan. To make it easy, use StackSets Stacks from the AWS Organizations level.
+3. deploy the [cf-prowler-org-account.yml](cf-prowler-org-account.yml) in the account using AWS Organizations
+4. deploy the [cf-prowler-spoke-account.yml](cf-prowler-spoke-account.yml) in all the accounts using to scan. To make it easy, use StackSets Stacks from the AWS Organizations level.
 6. deploy the cf-prowler-batch.yml CloudFormation stack in the central account
 
 Do not forget a strong ExternalId like UUID.
@@ -43,4 +43,4 @@ When installed, no action is needed.
 
 ## Extension
 
-It is possible to export Prowler's results into csv files and run Athena on into for large investigations.
+It is possible to export Prowler's results into csv files and run Athena on results for large investigations.
