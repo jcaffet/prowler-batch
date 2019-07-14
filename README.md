@@ -6,7 +6,6 @@ Prowler Batch is an AWS account security scanner specialist based on [Prowler sc
 
 People need to audit their account to seek security issues or validate compliance. Prowler Batch is here to do the job for you at a defined frequency.
 It ensures cost containment and security hardening.
-Reports are stored into an S3 Bucket.
 
 ## Design
 
@@ -39,20 +38,20 @@ Prowler needs :
 - a VPC
 - a private subnet with Internet connection (through a NAT Gateway)
 
-## Steps
+### Steps
 
 1. deploy the [cf-prowler-common.yml](cf-prowler-common.yml) CloudFormation stack in the central account
 2. Git clone prowler scans into this directory and build, tag and push the Docker image. Follow the information provided in the ECR repository page.
 3. deploy the [cf-prowler-org-account.yml](cf-prowler-org-account.yml) in the account using AWS Organizations
 4. deploy the [cf-prowler-spoke-account.yml](cf-prowler-spoke-account.yml) in all the accounts using to scan. To make it easy, use StackSets Stacks from the AWS Organizations level.
-6. deploy the cf-prowler-batch.yml CloudFormation stack in the central account
+6. deploy the [cf-prowler-batch.yml](cf-prowler-batch.yml) CloudFormation stack in the central account
 
 Do not forget a strong ExternalId like UUID.
 
 ## How to use it
 
-When installed, no action is needed.
+When installed, no action is needed. New accounts are involved and you just have to enjoy looking the results in the S3 bucket.
 
 ## Extension
 
-It is possible to export Prowler's results into csv files and run Athena on results for large investigations.
+It is possible to export Prowler's results into csv files and run Athena on results for large investigations or compliance reports.
