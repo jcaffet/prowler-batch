@@ -13,6 +13,11 @@ Parameters:
     Description: Prowler Role ExternalID
     Type: String
 
+  ProwlerStackSetSpokeName:
+    Description: Name of the StackSet in charge of distributing spoke account assets
+    Type: String
+    Default: prowler-spoke-account
+
 Resources:
 
   ProwlerOrganizationsRole:
@@ -38,3 +43,10 @@ Resources:
           - Effect: "Allow"
             Action: organizations:ListAccounts
             Resource: '*'
+      - PolicyName: "AllowUpdateStackInstances"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action: cloudformation:CreateStackInstances
+            Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stackset/${ProwlerStackSetSpokeName}:*"

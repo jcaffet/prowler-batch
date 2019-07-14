@@ -8,7 +8,13 @@ People need to audit their account to seek security issues or validate complianc
 It ensures cost containment and security hardening.
 Reports are stored into an S3 Bucket.
 
-## Technicals details
+## Design
+
+### Diagram
+
+![Prowler Batch Diagram](images/prowlerbatch-diagram.png)
+
+## Content
 
 Prowler batch simply runs [Prowler script](https://github.com/toniblyx/prowler) into AWS Batch jobs.
 It industrializes the scan process thanks to the following AWS resources :
@@ -19,15 +25,21 @@ It industrializes the scan process thanks to the following AWS resources :
 - S3 to store generated reports
 - CloudWatch Logs to log the global activity
 
-![Prowler Batch Diagram](images/prowlerbatch-diagram.png)
+### Explanation
 
-## Prerequisites
+The system works around two independent Lambdas :
+- cloudsploit-job-launcher : retrieves all the accounts from AWS Organizations and submit as many AWS Batch jobs as there are accounts.  This Lambda is invoked by a CloudWatch rule but could be invoked manually.
+- cloudsploit-account-harverster : it is in charge of updating the StackSet that spread on all accounts the role used by Batch jobs to scan the accounts. This Lambda is invoked by a CloudWatch rule but could be invoked manually.
+
+## Installation
+
+### Prerequisites
 
 Prowler needs :
 - a VPC
 - a private subnet with Internet connection (through a NAT Gateway)
 
-## Installation
+## Steps
 
 1. deploy the [cf-prowler-common.yml](cf-prowler-common.yml) CloudFormation stack in the central account
 2. Git clone prowler scans into this directory and build, tag and push the Docker image. Follow the information provided in the ECR repository page.
