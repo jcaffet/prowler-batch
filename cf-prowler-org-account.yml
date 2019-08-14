@@ -4,12 +4,12 @@ Description: Stack providing cross account access for Prowler
 
 Parameters:
 
-  ProwlerAccount:
+  ProwlerCentralAccount:
     Description: AWS account ID where Prowler is installed
     Type: String
     ConstraintDescription: Must be a valid AWS account ID
 
-  ProwlerRoleExternalId:
+  ProwlerOrgRoleExternalId:
     Description: Prowler Role ExternalID
     Type: String
 
@@ -20,10 +20,10 @@ Parameters:
 
 Resources:
 
-  ProwlerOrganizationsRole:
+  ProwlerOrgRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: prowler-organizations-role
+      RoleName: prowler-organizations-role2
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Statement:
@@ -34,7 +34,7 @@ Resources:
           - sts:AssumeRole
           Condition:
             StringEquals:
-              "sts:ExternalId": !Sub '${ProwlerRoleExternalId}'
+              "sts:ExternalId": !Sub '${ProwlerOrgRoleExternalId}'
       Policies:
       - PolicyName: "AllowOrganizationListAccounts"
         PolicyDocument:
@@ -48,5 +48,7 @@ Resources:
           Version: "2012-10-17"
           Statement:
           - Effect: "Allow"
-            Action: cloudformation:CreateStackInstances
+            Action:
+            - cloudformation:CreateStackInstances
+            - cloudformation:ListStackInstances
             Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stackset/${ProwlerStackSetSpokeName}:*"
