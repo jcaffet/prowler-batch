@@ -29,7 +29,7 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            AWS: !Sub 'arn:aws:iam::${ProwlerAccount}:root'
+            AWS: !Sub 'arn:aws:iam::${ProwlerCentralAccount}:root'
           Action:
           - sts:AssumeRole
           Condition:
