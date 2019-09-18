@@ -1,8 +1,10 @@
 FROM amazonlinux:latest
 
 RUN yum -y update \
- && yum -y install which unzip aws-cli jq tar gzip \
+ && yum -y install aws-cli which unzip jq tar gzip python3-pip \
  && yum clean all
+
+RUN pip3 install ansi2html detect-secrets
 
 WORKDIR /prowler
 
