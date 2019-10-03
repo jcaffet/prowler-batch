@@ -1,7 +1,7 @@
 FROM amazonlinux:latest
 
 RUN yum -y update \
- && yum -y install aws-cli which unzip jq tar gzip python3-pip \
+ && yum -y install aws-cli which unzip jq tar gzip python3-pip file \
  && yum clean all
 
 RUN pip3 install ansi2html detect-secrets
