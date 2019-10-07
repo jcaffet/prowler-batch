@@ -30,7 +30,7 @@ Resources:
           - sts:AssumeRole
           Condition:
             StringEquals:
-              "sts:ExternalId": !Sub '${ProwlerRoleExternalId}'
+              "sts:ExternalId": !Ref ProwlerRoleExternalId
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/SecurityAudit
       Path: "/"
