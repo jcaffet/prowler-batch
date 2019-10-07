@@ -23,7 +23,7 @@ Resources:
   ProwlerOrgRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: prowler-organizations-role2
+      RoleName: prowler-organizations-role
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
         Statement:
@@ -34,7 +34,7 @@ Resources:
           - sts:AssumeRole
           Condition:
             StringEquals:
-              "sts:ExternalId": !Sub '${ProwlerOrgRoleExternalId}'
+              "sts:ExternalId": !Ref ProwlerOrgRoleExternalId
       Policies:
       - PolicyName: "AllowOrganizationListAccounts"
         PolicyDocument:
