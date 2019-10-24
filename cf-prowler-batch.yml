@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Prowler Batch
 # Name : prowler-batch
-# Architectural choices :
-# - no user, no password, no key, only roles
-# - no ssh access to compute envs
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -155,7 +152,7 @@ Resources:
     Type: "AWS::Batch::ComputeEnvironment"
     Properties:
       Type: MANAGED
-      ServiceRole: !Ref ComputeEnvironmentRole
+      ServiceRole: !GetAtt ComputeEnvironmentRole.Arn
       ComputeResources:
         MinvCpus: !Ref ComputeEnvMinCpu
         MaxvCpus: !Ref ComputeEnvMaxCpu
@@ -165,7 +162,7 @@ Resources:
         Subnets: !Ref ComputeEnvSubnets
         Type: SPOT
         BidPercentage: 50
-        SpotIamFleetRole: !Ref SpotFleetRole
+        SpotIamFleetRole: !GetAtt SpotFleetRole.Arn
         InstanceRole: !Ref EcsInstanceProfile
         InstanceTypes:
         - !Ref ComputeEnvInstanceTypes
